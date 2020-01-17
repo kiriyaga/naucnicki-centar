@@ -18,9 +18,9 @@ export class AddMagazineComponent implements OnInit {
 
   ngOnInit() {
 
-        let sessionUser = this.userService.getSessionUser();
+    let sessionUser = this.userService.getSessionUser();
     let x;
-    if(sessionUser.role == "ROLE_ADMIN"){
+    if(sessionUser !=null && sessionUser.role == "ROLE_ADMIN"){
       x= this.userService.getTasks(sessionUser.username);
     }
     else {
