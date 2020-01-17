@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import root.demo.model.SecurityUser;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -136,6 +137,14 @@ public class TokenUtils {
         final String processId = this.getUsernameFromToken(token);
         final Date created = this.getCreatedDateFromToken(token);
         return true;
+    }
+
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        SecurityUser user = (SecurityUser) userDetails;
+        final String username = this.getUsernameFromToken(token);
+        final Date created = this.getCreatedDateFromToken(token);
+        return (username.equals(user.getUsername()) && !(this.isTokenExpired(token))
+                && !(this.isCreatedBeforeLastPasswordReset(created, user.getLastPasswordReset())));
     }
 
 }

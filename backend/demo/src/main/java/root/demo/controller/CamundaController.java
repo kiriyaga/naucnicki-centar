@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +59,9 @@ public class CamundaController {
 	@Autowired
 	UserRepository userRepository;
 
+	@Autowired
+	private PasswordEncoder bcript;
+
 
 	@RequestMapping(method = RequestMethod.POST, value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> loginUser(@RequestBody LoginDto user) {
@@ -82,6 +87,7 @@ public class CamundaController {
         return new FormFieldsDto(task.getId(), pi.getId(), properties);
     }
 
+	@PreAuthorize("@securityService.hasProtectedAccess('ROLE_ADMIN')")
 	@GetMapping(path = "/get/{username}", produces = "application/json")
 	public @ResponseBody FormFieldsDto getTasksForAdmin(@PathVariable String username) {
 
@@ -125,6 +131,9 @@ public class CamundaController {
 		formService.submitTaskForm(taskId, map);
 		if(!taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list().isEmpty()){
 		Task taskNew = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list().get(0);
+		if(taskNew.getAssignee() != null && taskNew.getAssignee().equals("demo"))
+			return new FormFieldsDto(taskNew.getId(), taskNew.getProcessInstanceId() , null);
+
 			TaskFormData tfd = formService.getTaskFormData(taskNew.getId());
 			List<FormField> properties = tfd.getFormFields();
 			for(FormField fp : properties) {
@@ -151,11 +160,21 @@ public class CamundaController {
 		User user = new User();
 		user.setRoleEnum(RoleEnum.ROLE_ADMIN);
 		user.setUsername("demo");
-		user.setPassword("demo");
+		user.setPassword(bcript.encode("demo"));
 		user.setEmail("makiarambasic@gmail.com");
 		user.setActive(true);
 
-		return new ResponseEntity<>(userRepository.save(user),HttpStatus.OK);
+		User user1 = new User();
+		user1.setRoleEnum(RoleEnum.ROLE_USER);
+		user1.setUsername("mary");
+		user1.setPassword(bcript.encode("mary"));
+		user1.setEmail("makiarambasic@gmail.com");
+		user1.setActive(true);
+
+		userRepository.save(user);
+		userRepository.save(user1);
+		return new ResponseEntity<>("Created!",HttpStatus.OK);
+
 	}
 
 }

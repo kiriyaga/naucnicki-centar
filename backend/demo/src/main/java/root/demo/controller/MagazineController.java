@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import root.demo.dtos.FormFieldsDto;
@@ -47,9 +48,10 @@ public class MagazineController {
     @Autowired
     UserService userService;
 
+    @PreAuthorize("@securityService.hasProtectedAccess('ROLE_USER')")
     @GetMapping(path = "/get", produces = "application/json")
-    public @ResponseBody
-    FormFieldsDto get() {
+    public @ResponseBody FormFieldsDto get() {
+
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("Proces_Dodavanja_Casopisa");
         System.out.println("ProcessInstance" + pi.getId());
         Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).list().get(0);

@@ -66,9 +66,6 @@
         <camunda:formData>
           <camunda:formField id="potvrda" label="Potvrdi recezenta" type="boolean" />
           <camunda:formField id="FormField_3bt916s" label="Korisnik" type="string" defaultValue="#{username}">
-            <camunda:validation>
-              <camunda:constraint name="readonly" config="readonly" />
-            </camunda:validation>
           </camunda:formField>
         </camunda:formData>
         <camunda:inputOutput>

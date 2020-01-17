@@ -1,16 +1,24 @@
 package root.demo.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import root.demo.services.SecurityService;
 
 import javax.ws.rs.HttpMethod;
 import java.util.Arrays;
@@ -20,7 +28,8 @@ import java.util.Arrays;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-   /* @Autowired
+    @Autowired
+    @Qualifier("Autorization")
     private UserDetailsService userDetailsService;
 
     @Autowired
@@ -56,7 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public SecurityService securityService() {
         return this.securityService;
     }
-*/
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -74,13 +83,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/register/**").permitAll()
+                .authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/register/get/").authenticated().antMatchers(HttpMethod.OPTIONS, "/register/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/h2-console/**").permitAll().antMatchers(HttpMethod.OPTIONS, "/magazine/**").permitAll().anyRequest().authenticated().and()
                 .cors();
         httpSecurity.headers().cacheControl();
         httpSecurity.headers().frameOptions().disable();
-        // Custom JWT based authentication
-        //httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        //Custom JWT based authentication
+        httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
 
 }

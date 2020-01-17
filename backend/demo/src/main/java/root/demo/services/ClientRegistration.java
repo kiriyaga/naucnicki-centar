@@ -4,6 +4,7 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import root.demo.dtos.FormSubmissionDto;
 import root.demo.model.RoleEnum;
@@ -18,6 +19,9 @@ public class ClientRegistration implements JavaDelegate {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder bcript;
+
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
         //get podatke i sacuvaj :D
@@ -28,7 +32,7 @@ public class ClientRegistration implements JavaDelegate {
             if(field.getFieldId().equals("username"))
                 user.setUsername(field.getFieldValue());
             if(field.getFieldId().equals("password"))
-                user.setPassword(field.getFieldValue());
+                user.setPassword(bcript.encode(field.getFieldValue()));
             if(field.getFieldId().equals("email"))
                 user.setEmail(field.getFieldValue());
             if(field.getFieldId().equals("grad"))

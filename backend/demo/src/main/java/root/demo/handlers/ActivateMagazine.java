@@ -9,6 +9,5 @@ public class ActivateMagazine implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
-
     }
 }
